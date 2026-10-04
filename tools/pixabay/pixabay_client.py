@@ -83,6 +83,8 @@ class PixabayClient:
             if e.code == 429:
                 raise PixabayError(f"Pixabay rate limit exceeded (100 requests/60s): {body}") from e
             raise PixabayError(f"Pixabay API {e.code}: {body}") from e
+        except urllib.error.URLError as e:
+            raise PixabayError(f"Could not reach Pixabay: {e.reason}") from e
 
         if cache_file:
             cache_file.parent.mkdir(parents=True, exist_ok=True)

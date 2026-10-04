@@ -123,6 +123,11 @@ class ClientTests(unittest.TestCase):
             with self.assertRaisesRegex(PixabayError, "rate limit"):
                 PixabayClient("KEY", use_cache=False).search_videos("x")
 
+    def test_network_error(self):
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("blocked")):
+            with self.assertRaisesRegex(PixabayError, "Could not reach Pixabay"):
+                PixabayClient("KEY", use_cache=False).search_videos("x")
+
     def test_query_length_limit(self):
         with self.assertRaises(ValueError):
             PixabayClient("KEY").search_videos("x" * 101)

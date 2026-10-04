@@ -9,6 +9,7 @@ Docs: https://unsplash.com/documentation
 import json
 import os
 import re
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -69,6 +70,8 @@ class UnsplashClient:
         except urllib.error.HTTPError as e:
             body = e.read().decode("utf-8", "replace")
             raise UnsplashError(f"Unsplash API {e.code} for {path}: {body}") from e
+        except urllib.error.URLError as e:
+            raise UnsplashError(f"Could not reach Unsplash: {e.reason}") from e
 
     # -- API ------------------------------------------------------------------
 

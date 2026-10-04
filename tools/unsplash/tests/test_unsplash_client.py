@@ -3,6 +3,7 @@ import json
 import sys
 import tempfile
 import unittest
+import urllib.error
 import urllib.parse
 from pathlib import Path
 from unittest import mock
@@ -81,6 +82,11 @@ class ClientTests(unittest.TestCase):
         image_url = calls[1]
         q = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(image_url).query))
         self.assertEqual((q["w"], q["h"], q["fit"], q["ixid"]), ("1920", "1080", "crop", "x"))
+
+    def test_network_error(self):
+        with mock.patch("urllib.request.urlopen", side_effect=urllib.error.URLError("blocked")):
+            with self.assertRaisesRegex(UnsplashError, "Could not reach Unsplash"):
+                UnsplashClient("KEY").search_photos("x")
 
     def test_attribution(self):
         credit = attribution(PHOTO)
